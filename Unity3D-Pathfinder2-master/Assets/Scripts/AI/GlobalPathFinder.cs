@@ -10,7 +10,7 @@ public class GlobalPathFinder : MonoBehaviour
     [SerializeField] private GameObject _endPoint;
 
     [SerializeField] private GlobalRegion _regionStartPoint;
-    [SerializeField] private GlobalRegion _regoinEndPoint;
+    [SerializeField] private GlobalRegion _regionEndPoint;
 
     [SerializeField] private List<GlobalRegion> _path = new List<GlobalRegion>();
 
@@ -24,6 +24,7 @@ public class GlobalPathFinder : MonoBehaviour
     public void Setup()
     {
         SetIsDesiredRegions(_startPoint, _endPoint);
+        ImportanceRegion();
         CreatePath();
     }
 
@@ -49,7 +50,7 @@ public class GlobalPathFinder : MonoBehaviour
         {
             Debug.Log("Update" + _idRegion);
             _idRegion++;
-            if (_path[_idRegion] ==_regoinEndPoint)
+            if (_path[_idRegion] ==_regionEndPoint)
             {
                 Debug.Log("Конец пути"+ _path[_idRegion].name +" ID"+_idRegion);
                 _localPathFinder.Setup(_path[_idRegion], _endPoint);
@@ -110,7 +111,7 @@ public class GlobalPathFinder : MonoBehaviour
         {
             GlobalRegion current = nodes.Dequeue();
             //  Если достали целевую - можно заканчивать (это верно и для A*)
-            if (current == _regoinEndPoint) break;
+            if (current == _regionEndPoint) break;
             //Debug.Log("Взяли" +current.name);
             var neighbours = current.GetNeighbours(regions);
             //Debug.Log(neighbours.Count);
@@ -137,8 +138,50 @@ public class GlobalPathFinder : MonoBehaviour
         }
         if (isEndPoint == true)
         {
-            _regoinEndPoint = reg;
+            _regionEndPoint = reg;
         }
     }
 
+
+    private void ImportanceRegion()
+    {
+        GlobalRegion currentRegion=_regionEndPoint;
+        GlobalRegion constRegion=currentRegion;
+        int koef=0;
+        currentRegion.importance=koef;
+        koef++;
+        for(int d=0;d<100;d++)
+        {
+            for(int i=0;i<currentRegion._neighboursRegion.Length;i++)
+            {
+                if(currentRegion._neighboursRegion[i].importance==-1)
+                currentRegion._neighboursRegion[i].importance=koef;
+            }
+            koef++;
+            if(currentRegion._neighboursRegion.Length==1)
+            {
+                constRegion=currentRegion._neighboursRegion[0];
+            }
+            int count=0;
+            for(int i=0;i<currentRegion._neighboursRegion.Length;i++)
+            {
+                if(currentRegion._neighboursRegion[i].importance!=-1)
+                count++;
+            }
+            for(int i=0;i<currentRegion._neighboursRegion.Length;i++)
+            {
+                if(currentRegion._neighboursRegion[i]._istagged==false)
+                {
+                    currentRegion=currentRegion._neighboursRegion[i];
+                   
+                    Debug.Log("Region Current"+ currentRegion.name);
+                }
+            }
+            if(count==currentRegion._neighboursRegion.Length)
+            {
+                currentRegion._istagged=true;
+                currentRegion=constRegion;
+            }
+        }
+    }
 }

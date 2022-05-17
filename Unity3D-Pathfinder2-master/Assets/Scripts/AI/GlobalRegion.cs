@@ -5,6 +5,10 @@ using UnityEngine;
 public class GlobalRegion : MonoBehaviour
 {
     public GlobalRegion[] _neighboursRegion;
+
+    public int importance=-1;
+
+    public bool _istagged=false;
     
     public List<GameObject> _nodeRegion=new List<GameObject>();
     [SerializeField] private float _checkDist=5;
@@ -49,7 +53,7 @@ public class GlobalRegion : MonoBehaviour
     public  List<GlobalRegion> GetNeighbours(List<GlobalRegion> queueRegion)
     {
         List<GlobalRegion> withoutRepeatNeighbours=new List<GlobalRegion>();
-       
+
         
        
 
